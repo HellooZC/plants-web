@@ -1,42 +1,5 @@
 <?php
 include 'db_connection.php'; 
-
-// Get the email from the session
-$email = $_SESSION['email'] ?? null;
-
-if ($email) {
-    $stmt = $conn->prepare('SELECT first_name, last_name, dob, gender, contact_number, hometown, profile_image, resume_path FROM user_table WHERE email = ?');
-    $stmt->bind_param('s', $email);
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    // Fetch the user data
-    $userData = $result->fetch_assoc();
-
-    // Check if data is retrieved
-    if ($userData) {
-        $firstName = $userData['first_name'];
-        $lastName = $userData['last_name'];
-        $dob = $userData['dob'];
-        $gender = $userData['gender'];
-        $contactNumber = $userData['contact_number'];
-        $hometown = $userData['hometown'];
-        $profileImage = $userData['profile_image'] ?? 'images/boys.jpg'; // Default image if none exists
-        $resumePath = $userData['resume_path'] ?? null; // Retrieve resume path
-    } else {
-        // Handle case where no user data is found
-        $firstName = $lastName = $dob = $gender = $contactNumber = $hometown = 'N/A';
-        $profileImage = 'images/boys.jpg';
-        $resumePath = null;
-    }
-
-    // Close the database connection
-    $conn->close();
-} else {
-    // Handle case where user is not logged in
-    header('Location: login.php'); // Redirect to login page
-    exit;
-}
 ?>
 
 <!DOCTYPE html>

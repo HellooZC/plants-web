@@ -42,13 +42,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $sql = "INSERT INTO plant_table (Scientific_Name, Common_Name, Family, Genus, Species, plants_image, description, status)
             VALUES ('$scientific_name', '$common_name', '$family', '$genus', '$species', '$plants_image', '$description_path', 'pending')";
 
-    if ($conn->query($sql) === TRUE) {
-        $message = "Plant submitted successfully! Awaiting approval.";
-        $status = "success";
-    } else {
-        $message = "Error: " . $conn->error;
-        $status = "error";
-    }
+    // After finishing your insert/update
+if ($conn->query($sql) === TRUE) {
+    $message = "Plant submitted successfully! Awaiting approval.";
+    $status = "success";
+} else {
+    $message = "Error: " . $conn->error;
+    $status = "error";
+}
+
+// Close connection (PDO way)
+$conn = null;
+
 
     echo "<script>
         window.onload = function() {
