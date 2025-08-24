@@ -1,14 +1,28 @@
 <?php
-$servername = "localhost"; // Your database server name
-$username = "root"; // Your database username
-$password = ""; // Your database password
-$dbname = "PlantBiodiversity"; // Your database name
+// Get the Render PostgreSQL connection string from environment
+$url = getenv("DATABASE_URL");
 
-// Create a connection
-$conn = new mysqli($servername, $username, $password, $dbname);
+if (!$url) {
+    die("DATABASE_URL environment variable is not set.");
+}
 
-// Check the connection
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+// Parse the DATABASE_URL
+$db = parse_url($url);
+
+$host = $db['host'];
+$port = $db['port'];
+$user = $db['user'];
+$pass = $db['pass'];
+$name = ltrim($db['path'], '/');
+
+try {
+    // Create a new PDO connection to PostgreSQL
+    $conn = new PDO("pgsql:host=$host;port=$port;dbname=$name", $user, $pass, [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+    ]);
+    // Optional: uncomment for debugging
+    // echo "✅ Connected to PostgreSQL database.";
+} catch (PDOException $e) {
+    die("❌ Database connection failed: " . $e->getMessage());
 }
 ?>
