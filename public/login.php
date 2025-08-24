@@ -12,19 +12,20 @@ session_start();
 include 'header.php';
 include 'db_connection.php';
 
-$success = false; // Initialize the variable
+$success = false;
+$errors = []; // initialize errors array
 
 // Check if form is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-  $email = $_POST['email'];
-  $password = $_POST['password'];
+    $email = $_POST['email'];
+    $password = $_POST['password'];
 
-  // Validate input
-  if (empty($email) || empty($password)) {
-      $errors[] = "Please enter both email and password.";
-  } else {
-      // Prepare statement and execute
-       $stmt = $conn->prepare("SELECT email, password, type FROM account_table WHERE email = :email");
+    // Validate input
+    if (empty($email) || empty($password)) {
+        $errors[] = "Please enter both email and password.";
+    } else {
+        // Prepare statement and execute
+        $stmt = $conn->prepare("SELECT email, password, type FROM account_table WHERE email = :email");
         $stmt->execute([':email' => $email]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -36,12 +37,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         } else {
             $errors[] = "Invalid email or password.";
         }
-      } else {
-          $errors[] = "No account found with this email.";
-      }
-  }
+    }
 }
 ?>
+
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <div class="login-container-fluid">
