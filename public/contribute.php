@@ -1,12 +1,12 @@
-<?php
+﻿<?php
 include 'db_connection.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $scientific_name = $conn->real_escape_string($_POST['scientific_name']);
-    $common_name = $conn->real_escape_string($_POST['common_name']);
-    $family = $conn->real_escape_string($_POST['family']);
-    $genus = $conn->real_escape_string($_POST['genus']);
-    $species = $conn->real_escape_string($_POST['species']);
+    $scientific_name = $_POST['scientific_name'];
+    $common_name     = $_POST['common_name'];
+    $family          = $_POST['family'];
+    $genus           = $_POST['genus'];
+    $species         = $_POST['species'];
 
     // Handle multiple image uploads
     $image_paths = [];
@@ -27,7 +27,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
     $plants_image = json_encode($image_paths);
 
-
     // Handle PDF upload
     $description_path = null;
     if (!empty($_FILES['description']['tmp_name'])) {
@@ -38,22 +37,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     }
 
-    // Insert into database
-    $sql = "INSERT INTO plant_table (Scientific_Name, Common_Name, Family, Genus, Species, plants_image, description, status)
-            VALUES ('$scientific_name', '$common_name', '$family', '$genus', '$species', '$plants_image', '$description_path', 'pending')";
+    // ✅ Use prepared statement with PDO
+    $sql = "INSERT INTO plant_table 
+        (Scientific_Name, Common_Name, Family, Genus, Species, plants_image, description, status)
+        VALUES (:scientific_name, :common_name, :family, :genus, :species, :plants_image, :description, 'pending')";
 
-    // After finishing your insert/update
-if ($conn->query($sql) === TRUE) {
-    $message = "Plant submitted successfully! Awaiting approval.";
-    $status = "success";
-} else {
-    $message = "Error: " . $conn->error;
-    $status = "error";
-}
+    $stmt = $conn->prepare($sql);
 
-// Close connection (PDO way)
-$conn = null;
+    $success = $stmt->execute([
+        ':scientific_name' => $scientific_name,
+        ':common_name'     => $common_name,
+        ':family'          => $family,
+        ':genus'           => $genus,
+        ':species'         => $species,
+        ':plants_image'    => $plants_image,
+        ':description'     => $description_path
+    ]);
 
+    if ($success) {
+        $message = "Plant submitted successfully! Awaiting approval.";
+        $status = "success";
+    } else {
+        $message = "Error: " . implode(", ", $stmt->errorInfo());
+        $status = "error";
+    }
 
     echo "<script>
         window.onload = function() {
@@ -69,6 +76,7 @@ $conn = null;
     </script>";
 }
 ?>
+
 
 
 <!DOCTYPE html>
