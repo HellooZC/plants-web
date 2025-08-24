@@ -24,31 +24,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       $errors[] = "Please enter both email and password.";
   } else {
       // Prepare statement and execute
-      $stmt = $conn->prepare("SELECT email, password, type FROM account_table WHERE email = ?");
-      $stmt->bind_param('s', $email);
-      $stmt->execute();
-      $result = $stmt->get_result();
+      $stmt = $conn->prepare("SELECT email, password, type FROM account_table WHERE email = :email");
+    $stmt->execute([':email' => $email]);
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-      // Check if the user exists
-      if ($result && $result->num_rows > 0) {
-          // Fetch user data
-          $user = $result->fetch_assoc();
+    if ($user && password_verify($password, $user['password'])) {
+        $_SESSION['loggedin'] = true;
+        $_SESSION['email'] = $user['email'];
+        $_SESSION['type'] = $user['type'];
+        $success = true;
+    } else {
+        $errors[] = "Invalid email or password.";
+    }
 
-          // Verify the password
-          if (password_verify($password, $user['password'])) {
-              // Set session variables
-              $_SESSION['loggedin'] = true;
-              $_SESSION['email'] = $user['email'];
-              $_SESSION['type'] = $user['type'];
-
-              // Mark success
-              $success = true;
-          } else {
-              $errors[] = "Incorrect password.";
-          }
-      } else {
-          $errors[] = "No account found with this email.";
-      }
   }
 }
 ?>
