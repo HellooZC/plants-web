@@ -8,7 +8,7 @@
 </head>
 <body>
 <?php
-
+session_start();
 include 'header.php';
 include 'db_connection.php';
 
@@ -24,19 +24,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
       $errors[] = "Please enter both email and password.";
   } else {
       // Prepare statement and execute
-      $stmt = $conn->prepare("SELECT email, password, type FROM account_table WHERE email = :email");
-    $stmt->execute([':email' => $email]);
-    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+       $stmt = $conn->prepare("SELECT email, password, type FROM account_table WHERE email = :email");
+        $stmt->execute([':email' => $email]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if ($user && password_verify($password, $user['password'])) {
-        $_SESSION['loggedin'] = true;
-        $_SESSION['email'] = $user['email'];
-        $_SESSION['type'] = $user['type'];
-        $success = true;
-    } else {
-        $errors[] = "Invalid email or password.";
-    }
-
+        if ($user && password_verify($password, $user['password'])) {
+            $_SESSION['loggedin'] = true;
+            $_SESSION['email'] = $user['email'];
+            $_SESSION['type'] = $user['type'];
+            $success = true;
+        } else {
+            $errors[] = "Invalid email or password.";
+        }
+      } else {
+          $errors[] = "No account found with this email.";
+      }
   }
 }
 ?>
