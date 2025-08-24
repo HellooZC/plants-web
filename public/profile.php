@@ -1,5 +1,4 @@
 <?php
-include 'session_check.php'; // Check if user is logged in
 include 'db_connection.php'; 
 
 // Get the email from the session

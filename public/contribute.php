@@ -1,6 +1,5 @@
 <?php
 include 'db_connection.php';
-include 'session_check.php';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $scientific_name = $conn->real_escape_string($_POST['scientific_name']);
