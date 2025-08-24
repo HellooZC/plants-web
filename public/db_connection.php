@@ -15,6 +15,9 @@ $user = $db['user'];
 $pass = $db['pass'];
 $name = ltrim($db['path'], '/');
 
+echo "Raw DATABASE_URL: [$url]<br>";
+echo "Parsed dbname: [$name]<br>";
+
 try {
     // Create a new PDO connection to PostgreSQL
     $conn = new PDO("pgsql:host=$host;port=$port;dbname=$name", $user, $pass, [
