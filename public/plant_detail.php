@@ -1,4 +1,4 @@
-<?php include 'session_check.php'; ?>
+
 <?php include 'db_connection.php'; ?>
 
 <!DOCTYPE html>
